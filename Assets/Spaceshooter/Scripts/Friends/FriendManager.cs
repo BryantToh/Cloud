@@ -43,15 +43,16 @@ public class FriendManager : MonoBehaviour
             Transform child = displayList.transform.GetChild(i);
             Destroy(child.gameObject);
         }
-
+ 
 
         friendsCache.ForEach(f => {
 
             switch (listType)
             {
                 case 0:
-                    if (f.Tags.Contains("friends"))
+                    if (f.Tags.Contains("friend"))
                     {
+                        Debug.Log("Friends");
                         GameObject friendPrefab = Instantiate(FriendPrefab);
                         friendPrefab.transform.SetParent(displayList.transform);
                         //setting the Name placeholder to name of friend

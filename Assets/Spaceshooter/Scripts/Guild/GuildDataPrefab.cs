@@ -5,40 +5,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GuildData : MonoBehaviour
+public class GuildDataPrefab : MonoBehaviour
 {
     string PlayerTitleID;
-    string userGroupID;
+    public string userGroupID;
     private AcceptGroupInvitationRequest lastAcceptedInvite;
     public readonly HashSet<KeyValuePair<string, string>> EntityGroupPairs = new HashSet<KeyValuePair<string, string>>();
     // Start is called before the first frame update
     void Start()
     {
         //GetGroupId();
-        GetUserAccountInfo(result =>
-        {
-            Debug.Log(PlayerTitleID); // This will now log the correct value
-                                 // Perform any other initialization or logic here after obtaining PlayFab ID
-        });
+        GetUserAccountInfo();
     }
 
-    public void GetUserAccountInfo(System.Action<GetPlayerProfileResult> callback)
-    {
-        var request = new GetPlayerProfileRequest
-        {
 
+    public void GetUserAccountInfo()
+    {
+        var request = new GetAccountInfoRequest
+        {
         };
 
-        PlayFabClientAPI.GetPlayerProfile(request, result =>
-        {
-            PlayerTitleID = result.PlayerProfile.PlayerId;
-            callback(result); // Invoke the callback passing the result
-        },
-        errorResult =>
-        {
-            Debug.Log(errorResult);
-        });
+        PlayFabClientAPI.GetAccountInfo(request, result => { PlayerTitleID = result.AccountInfo.TitleInfo.TitlePlayerAccount.Id; }, Errorresult => { Debug.Log(Errorresult); });
     }
+
 
     public static PlayFab.GroupsModels.EntityKey EntityKeyMaker(string entityId, string type)
     {
@@ -103,55 +92,21 @@ public class GuildData : MonoBehaviour
     //    }
     //}
 
-    public void SimulateAcceptInvite()
+    public void SimulateAcceptGroup()
     {
-        // Simulate receiving an invitation
-        var simulatedInvite = new AcceptGroupInvitationRequest
-        {
-            Entity = new PlayFab.GroupsModels.EntityKey { Id = PlayerTitleID, Type = "title_player_account" },
-            Group = new PlayFab.GroupsModels.EntityKey { Id = userGroupID, Type = "group" }
-        };
-
-        // Store the simulated invite for later processing in OnAcceptInvite
-        lastAcceptedInvite = simulatedInvite;
-
-        // Call OnAcceptInvite as if it was triggered by a PlayFab response
-        OnAcceptInvite(new PlayFab.GroupsModels.EmptyResponse());
+        var request = new AcceptGroupInvitationRequest { Group = new PlayFab.GroupsModels.EntityKey { Id = userGroupID, Type = "group" }, Entity = new PlayFab.GroupsModels.EntityKey { Id = PlayerTitleID, Type = "title_player_account" } };
+        PlayFabGroupsAPI.AcceptGroupInvitation(request, result => {
+            Destroy(gameObject);
+        }, result => Debug.Log(result));
     }
-
-    public void OnAcceptInvite(PlayFab.GroupsModels.EmptyResponse response)
+    public void SimulateDeclineGroup()
     {
-        if (lastAcceptedInvite != null)
-        {
-            Debug.Log("Entity Added to Group: " + lastAcceptedInvite.Entity.Id + " to " + lastAcceptedInvite.Group.Id);
-            EntityGroupPairs.Add(new KeyValuePair<string, string>(lastAcceptedInvite.Entity.Id, lastAcceptedInvite.Group.Id));
-
-            // Optionally, clear the stored invite after processing
-            lastAcceptedInvite = null;
-        }
-        else
-        {
-            Debug.LogError("No pending invite found.");
-        }
+        var request = new AcceptGroupInvitationRequest { Group = new PlayFab.GroupsModels.EntityKey { Id = userGroupID, Type = "group" }, Entity = new PlayFab.GroupsModels.EntityKey { Id = PlayerTitleID, Type = "title_player_account" } };
+        PlayFabGroupsAPI.AcceptGroupInvitation(request, result => {
+            KickMember(userGroupID, new PlayFab.GroupsModels.EntityKey { Id = PlayerTitleID, Type = "title_player_account" });  
+            Destroy(gameObject);
+        }, result => Debug.Log(result));
     }
-    //public void OnAcceptInvite(PlayFab.GroupsModels.EmptyResponse response)
-    //{
-    //    var prevRequest = (AcceptGroupInvitationRequest)response.Request;
-    //    Debug.Log("Entity Added to Group: " + prevRequest.Entity.Id + " to " + prevRequest.Group.Id);
-    //    EntityGroupPairs.Add(new KeyValuePair<string, string>(prevRequest.Entity.Id, prevRequest.Group.Id));
-    //}
-
-    //public void OnAcceptApplication(PlayFab.GroupsModels.EmptyResponse response)
-    //{
-    //    var prevRequest = (AcceptGroupApplicationRequest)response.Request;
-    //    Debug.Log("Entity Added to Group: " + prevRequest.Entity.Id + " to " + prevRequest.Group.Id);
-    //}
-    //public void Decline()
-    //{
-    //    SimulateAcceptInvite();
-    //    KickMember(userGroupID);
-    //}
-
     public void KickMember(string groupId, PlayFab.GroupsModels.EntityKey entityKey)
     {
         var request = new RemoveMembersRequest { Group = EntityKeyMaker(groupId, "group"), Members = new List<PlayFab.GroupsModels.EntityKey> { entityKey } };

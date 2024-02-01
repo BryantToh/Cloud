@@ -418,7 +418,7 @@ public class Guild : MonoBehaviour
                 Group = EntityKeyMaker(userGroupID, "group"),
                 Entity = EntityKeyMaker(invitedPlayerId, "title_player_account")
             };
-            PlayFabGroupsAPI.InviteToGroup(request, OnInvite, result => Debug.Log(result));
+            PlayFabGroupsAPI.InviteToGroup(request, result => Debug.Log(result), result => Debug.Log(result));
         }
         else
         {
@@ -427,12 +427,7 @@ public class Guild : MonoBehaviour
         }
     }
 
-    public void OnInvite(InviteToGroupResponse response)
-    {
-        GameObject instantiatedObject = Instantiate(invitedUser);
-        instantiatedObject.transform.SetParent(displayList.transform);
-        instantiatedObject.transform.Find("Name").GetComponent<TMP_Text>().text = inviteplayerID.text;
-    }
+
 
     //public void ApplyToGroup(string groupId, PlayFab.GroupsModels.EntityKey entityKey)
     //{
@@ -452,7 +447,21 @@ public class Guild : MonoBehaviour
     {
         SceneManager.LoadScene("Menu");
     }
+    bool Invites = false;
 
+    public void ToggleInvites()
+    {
+        if(Invites == true)
+        {
+            Invites = false;
+            CloseRequest();
+        }
+        else
+        {
+            Invites = true;
+            OpenRequest();
+        }
+    }
     public void OpenCreate()
     {
         createOwnGuild.SetActive(true);

@@ -2004,7 +2004,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 0
+  m_ChildAlignment: 1
   m_Spacing: 1
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
@@ -4391,7 +4391,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1459042937}
         m_TargetAssemblyTypeName: Guild, Assembly-CSharp
-        m_MethodName: OpenRequest
+        m_MethodName: ToggleInvites
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4534,8 +4534,9 @@ GameObject:
   - component: {fileID: 1582227614}
   - component: {fileID: 1582227616}
   - component: {fileID: 1582227615}
+  - component: {fileID: 1582227617}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: InvitePannel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4601,6 +4602,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1582227613}
   m_CullTransparentMesh: 1
+--- !u!114 &1582227617
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1582227613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c62c777e4b8f97b4191d0ab515be109a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Display: {fileID: 707260192}
+  GroupToPlayerPrefab: {fileID: 3261936620476178301, guid: 228dd7267e1ac2a43bccf1903745c160, type: 3}
 --- !u!1 &1585497145
 GameObject:
   m_ObjectHideFlags: 0
